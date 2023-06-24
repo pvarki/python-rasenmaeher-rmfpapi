@@ -1,7 +1,8 @@
 """pytest automagics"""
-from typing import Generator
+from typing import Generator, Dict
 import logging
 import os
+import uuid
 
 from libpvarki.logging import init_logging
 import pytest
@@ -26,3 +27,14 @@ def mtlsclient() -> Generator[TestClient, None, None]:
         },
     )
     yield client
+
+
+def create_user_dict(callsign: str) -> Dict[str, str]:
+    """return valid user dict for crud operations"""
+    return {"uuid": str(uuid.uuid4()), "callsign": callsign, "x509cert": "FIXME: insert dummy cert in CFSSL encoding"}
+
+
+@pytest.fixture(scope="session")
+def norppa11() -> Dict[str, str]:
+    """Session scoped user dict (to keep same UUID)"""
+    return create_user_dict("NORPPA11a")

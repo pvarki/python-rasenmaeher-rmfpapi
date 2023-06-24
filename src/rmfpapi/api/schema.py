@@ -23,3 +23,13 @@ class UserCRUDRequest(BaseModel, extra="forbid"):
     uuid: str = Field(description="RASENMAEHER UUID for this user")
     callsign: str = Field(description="Callsign of the user")
     x509cert: str = Field(description="Certificate encoded with CFSSL conventions (newlines escaped)")
+
+
+# FIXME: move to libpvarki
+class UserInstructionFragment(BaseModel, extra="forbid"):
+    """Product instructions for user"""
+
+    html: str = Field(description="The HTML content will be shown for this products instructions")
+    inject_css: Optional[str] = Field(
+        description="If extra stylesheet is needed, set the fully qualified URI", default=None, nullable=True
+    )

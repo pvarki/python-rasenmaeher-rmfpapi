@@ -1,9 +1,6 @@
 """Test the CRUD operations"""
 from typing import Dict
 import logging
-import uuid
-
-import pytest
 from fastapi.testclient import TestClient
 
 from .conftest import APP
@@ -12,17 +9,6 @@ LOGGER = logging.getLogger(__name__)
 
 
 # pylint: disable=redefined-outer-name
-
-
-def create_user_dict(callsign: str) -> Dict[str, str]:
-    """return valid user dict for crud operations"""
-    return {"uuid": str(uuid.uuid4()), "callsign": callsign, "x509cert": "FIXME: insert dummy cert in CFSSL encoding"}
-
-
-@pytest.fixture(scope="session")
-def norppa11() -> Dict[str, str]:
-    """Session scoped user dict (to keep same UUID)"""
-    return create_user_dict("NORPPA11a")
 
 
 def test_unauth(norppa11: Dict[str, str]) -> None:

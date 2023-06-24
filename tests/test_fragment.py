@@ -21,4 +21,4 @@ def test_get_fragment(norppa11: Dict[str, str], mtlsclient: TestClient) -> None:
     assert resp.status_code == 200
     payload = resp.json()
     assert "html" in payload
-    assert payload["html"] == "<p>Hello, World!</p>"
+    assert payload["html"] == "<p>Hello NORPPA11a!</p>"

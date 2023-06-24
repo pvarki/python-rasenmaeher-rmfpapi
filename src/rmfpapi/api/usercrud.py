@@ -4,6 +4,7 @@ import logging
 from fastapi import APIRouter, Depends
 from libpvarki.middleware import MTLSHeader
 
+# FIXME: when https://github.com/pvarki/python-libpvarki/pull/4 is merged use those
 from .schema import OperationResultResponse, UserCRUDRequest
 
 

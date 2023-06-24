@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends
 from libpvarki.middleware import MTLSHeader
 from jinja2 import Environment, FileSystemLoader
 
+# FIXME: when https://github.com/pvarki/python-libpvarki/pull/4 is merged use those
 from .schema import UserInstructionFragment, UserCRUDRequest
 from ..config import TEMPLATES_PATH
 

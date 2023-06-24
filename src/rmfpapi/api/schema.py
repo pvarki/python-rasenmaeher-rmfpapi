@@ -6,6 +6,7 @@ from pydantic.main import BaseModel  # pylint: disable=E0611 # false positive
 
 # pylint: disable=too-few-public-methods
 
+# FIXME: when https://github.com/pvarki/python-libpvarki/pull/4 is merged use those
 
 # FIXME: move to libpvarki
 class OperationResultResponse(BaseModel, extra="forbid"):

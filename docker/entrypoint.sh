@@ -1,4 +1,5 @@
 #!/bin/bash -l
+. /container-init.sh
 set -e
 if [ "$#" -eq 0 ]; then
   # FIXME: can we know the traefik/nginx internal docker ip easily ?

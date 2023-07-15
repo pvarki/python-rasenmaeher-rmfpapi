@@ -78,6 +78,7 @@ RUN --mount=type=ssh pip3 install wheel virtualenv \
 FROM builder_base as production_build
 # Copy entrypoint script
 COPY ./docker/entrypoint.sh /docker-entrypoint.sh
+COPY ./docker/container-init.sh /container-init.sh
 # Only files needed by production setup
 COPY ./poetry.lock ./pyproject.toml ./README.rst ./src /app/
 WORKDIR /app
@@ -95,6 +96,9 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 FROM python:3.11-slim-bookworm as production
 COPY --from=production_build /tmp/wheelhouse /tmp/wheelhouse
 COPY --from=production_build /docker-entrypoint.sh /docker-entrypoint.sh
+COPY --from=production_build /container-init.sh /container-init.sh
+COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
+
 WORKDIR /app
 # Install system level deps for running the package (not devel versions for building wheels)
 # and install the wheels we built in the previous step. generate default config
@@ -107,6 +111,7 @@ RUN --mount=type=ssh apt-get update && apt-get install -y \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
     && chmod a+x /docker-entrypoint.sh \
+    && chmod a+x /container-init.sh \
     && WHEELFILE=`echo /tmp/wheelhouse/rmfpapi-*.whl` \
     && pip3 install --find-links=/tmp/wheelhouse/ "$WHEELFILE"[all] \
     && rm -rf /tmp/wheelhouse/ \
@@ -136,6 +141,7 @@ ENTRYPOINT ["/usr/bin/tini", "--", "docker/entrypoint-test.sh"]
 # Re run install to get the service itself installed
 RUN --mount=type=ssh source /.venv/bin/activate \
     && poetry install --no-interaction --no-ansi \
+    && ln -s /app/docker/container-init.sh /container-init.sh \
     && docker/pre_commit_init.sh \
     && true
 
@@ -145,11 +151,13 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 ###########
 FROM devel_build as devel_shell
 # Copy everything to the image
+COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
 COPY . /app
 WORKDIR /app
 RUN apt-get update && apt-get install -y zsh \
     && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \
     && echo "source /root/.profile" >>/root/.zshrc \
     && pip3 install git-up \
+    && ln -s /app/docker/container-init.sh /container-init.sh \
     && true
 ENTRYPOINT ["/bin/zsh", "-l"]

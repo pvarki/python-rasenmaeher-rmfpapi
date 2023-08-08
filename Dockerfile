@@ -2,9 +2,9 @@
 #############################################
 # Tox testsuite for multiple python version #
 #############################################
-FROM advian/tox-base:debian-bullseye as tox
-ARG PYTHON_VERSIONS="3.11 3.10 3.9 3.8"
-ARG POETRY_VERSION="1.3.1"
+FROM advian/tox-base:debian-bookworm as tox
+ARG PYTHON_VERSIONS="3.11 3.10 3.9 3.11"
+ARG POETRY_VERSION="1.5.1"
 RUN export RESOLVED_VERSIONS=`pyenv_resolve $PYTHON_VERSIONS` \
     && echo RESOLVED_VERSIONS=$RESOLVED_VERSIONS \
     && for pyver in $RESOLVED_VERSIONS; do pyenv install -s $pyver; done \
@@ -19,7 +19,7 @@ RUN export RESOLVED_VERSIONS=`pyenv_resolve $PYTHON_VERSIONS` \
 ######################
 # Base builder image #
 ######################
-FROM python:3.8-bullseye as builder_base
+FROM python:3.11-bookworm as builder_base
 
 ENV \
   # locale
@@ -33,7 +33,7 @@ ENV \
   PIP_DISABLE_PIP_VERSION_CHECK=on \
   PIP_DEFAULT_TIMEOUT=100 \
   # poetry:
-  POETRY_VERSION=1.3.1
+  POETRY_VERSION=1.5.1
 
 
 RUN apt-get update && apt-get install -y \
@@ -66,9 +66,9 @@ COPY ./poetry.lock ./pyproject.toml /pysetup/
 # Install basic requirements (utilizing an internal docker wheelhouse if available)
 RUN --mount=type=ssh pip3 install wheel virtualenv \
     && poetry export -f requirements.txt --without-hashes -o /tmp/requirements.txt \
-    && pip3 wheel --wheel-dir=/tmp/wheelhouse --trusted-host 172.17.0.1 --find-links=http://172.17.0.1:3141/debian/ -r /tmp/requirements.txt \
+    && pip3 wheel --wheel-dir=/tmp/wheelhouse -r /tmp/requirements.txt \
     && virtualenv /.venv && source /.venv/bin/activate && echo 'source /.venv/bin/activate' >>/root/.profile \
-    && pip3 install --no-deps --trusted-host 172.17.0.1 --find-links=http://172.17.0.1:3141/debian/ --find-links=/tmp/wheelhouse/ /tmp/wheelhouse/*.whl \
+    && pip3 install --no-deps --find-links=/tmp/wheelhouse/ /tmp/wheelhouse/*.whl \
     && true
 
 
@@ -78,6 +78,7 @@ RUN --mount=type=ssh pip3 install wheel virtualenv \
 FROM builder_base as production_build
 # Copy entrypoint script
 COPY ./docker/entrypoint.sh /docker-entrypoint.sh
+COPY ./docker/container-init.sh /container-init.sh
 # Only files needed by production setup
 COPY ./poetry.lock ./pyproject.toml ./README.rst ./src /app/
 WORKDIR /app
@@ -92,24 +93,32 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 #########################
 # Main production build #
 #########################
-FROM python:3.8-slim-bullseye as production
+FROM python:3.11-slim-bookworm as production
 COPY --from=production_build /tmp/wheelhouse /tmp/wheelhouse
 COPY --from=production_build /docker-entrypoint.sh /docker-entrypoint.sh
+COPY --from=production_build /container-init.sh /container-init.sh
+COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
+
 WORKDIR /app
 # Install system level deps for running the package (not devel versions for building wheels)
 # and install the wheels we built in the previous step. generate default config
 RUN --mount=type=ssh apt-get update && apt-get install -y \
         bash \
-        libffi7 \
-        libzmq5 \
+        libffi8 \
         tini \
+        git \
+        openssh-client \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* \
     && chmod a+x /docker-entrypoint.sh \
+    && chmod a+x /container-init.sh \
     && WHEELFILE=`echo /tmp/wheelhouse/rmfpapi-*.whl` \
-    && pip3 install --trusted-host 172.17.0.1 --find-links=http://172.17.0.1:3141/debian/ --find-links=/tmp/wheelhouse/ "$WHEELFILE"[all] \
+    && pip3 install --find-links=/tmp/wheelhouse/ "$WHEELFILE"[all] \
     && rm -rf /tmp/wheelhouse/ \
     # Do whatever else you need to
+    # Map the special names to docker host internal ip because 127.0.0.1 is *container* localhost on login
+    && echo "sed 's/.*localmaeher.*//g' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts" >>/root/.profile \
+    && echo "echo \"\$(getent hosts host.docker.internal | awk '{ print $1 }') localmaeher.pvarki.fi mtls.localmaeher.pvarki.fi\" >>/etc/hosts" >>/root/.profile \
     && true
 ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 
@@ -121,8 +130,6 @@ FROM builder_base as devel_build
 # Install deps
 WORKDIR /pysetup
 RUN --mount=type=ssh source /.venv/bin/activate \
-    && export PIP_FIND_LINKS=http://172.17.0.1:3141/debian/ \
-    && export PIP_TRUSTED_HOST=172.17.0.1 \
     && poetry install --no-interaction --no-ansi \
     && true
 
@@ -136,9 +143,8 @@ WORKDIR /app
 ENTRYPOINT ["/usr/bin/tini", "--", "docker/entrypoint-test.sh"]
 # Re run install to get the service itself installed
 RUN --mount=type=ssh source /.venv/bin/activate \
-    && export PIP_FIND_LINKS=http://172.17.0.1:3141/debian/ \
-    && export PIP_TRUSTED_HOST=172.17.0.1 \
     && poetry install --no-interaction --no-ansi \
+    && ln -s /app/docker/container-init.sh /container-init.sh \
     && docker/pre_commit_init.sh \
     && true
 
@@ -148,18 +154,16 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 ###########
 FROM devel_build as devel_shell
 # Copy everything to the image
+COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
 COPY . /app
 WORKDIR /app
 RUN apt-get update && apt-get install -y zsh \
     && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \
-    && echo "if [ \"\$NO_WHEELHOUSE\" = \"1\" ]" >>/root/.profile \
-    && echo "then" >>/root/.profile \
-    && echo "  echo \"Wheelhouse disabled\"" >>/root/.profile \
-    && echo "else">>/root/.profile \
-    && echo "  export PIP_TRUSTED_HOST=172.17.0.1" >>/root/.profile \
-    && echo "  export PIP_FIND_LINKS=http://172.17.0.1:3141/debian/" >>/root/.profile \
-    && echo "fi" >>/root/.profile \
     && echo "source /root/.profile" >>/root/.zshrc \
     && pip3 install git-up \
+    # Map the special names to docker host internal ip because 127.0.0.1 is *container* localhost on login
+    && echo "sed 's/.*localmaeher.*//g' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts" >>/root/.profile \
+    && echo "echo \"\$(getent hosts host.docker.internal | awk '{ print $1 }') localmaeher.pvarki.fi mtls.localmaeher.pvarki.fi\" >>/etc/hosts" >>/root/.profile \
+    && ln -s /app/docker/container-init.sh /container-init.sh \
     && true
 ENTRYPOINT ["/bin/zsh", "-l"]

@@ -8,6 +8,9 @@ repository = "https://github.com/pvarki/python-rasenmaeher-rmfpapi/"
 license = "MIT"
 readme = "README.rst"
 
+[tool.poetry.scripts]
+rmfpapi = "rmfpapi.console:rmfpapi_cli"
+
 
 
 [tool.black]
@@ -58,7 +61,8 @@ branch = true
 
 [tool.poetry.dependencies]
 python = ">=3.8.1,<4.0"
-libpvarki = { git="https://github.com/pvarki/python-libpvarki.git", tag="1.2.0"}
+libadvian = "^1.4"
+libpvarki = { git="https://github.com/pvarki/python-libpvarki.git", tag="1.6.0"}
 fastapi = ">=0.89,<1.0,!=0.99.0"  # caret behaviour on 0.x is to lock to 0.x.*
 jinja2 = "^3.1"
 uvicorn = {version = "^0.20", extras = ["standard"]}

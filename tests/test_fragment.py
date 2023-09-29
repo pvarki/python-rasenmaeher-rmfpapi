@@ -22,3 +22,12 @@ def test_get_fragment(norppa11: Dict[str, str], mtlsclient: TestClient) -> None:
     payload = resp.json()
     assert "html" in payload
     assert payload["html"] == "<p>Hello NORPPA11a!</p>"
+
+
+def test_get_admin_fragment(mtlsclient: TestClient) -> None:
+    """Check that getting admin fragment works"""
+    resp = mtlsclient.get("/api/v1/admins/fragment")
+    assert resp.status_code == 200
+    payload = resp.json()
+    assert "html" in payload
+    assert payload["html"] == "<p>Hello to the admin</p>"

@@ -3,7 +3,8 @@ import logging
 
 from fastapi import APIRouter, Depends
 from libpvarki.middleware import MTLSHeader
-from libpvarki.schemas.product import OperationResultResponse, UserCRUDRequest
+from libpvarki.schemas.product import UserCRUDRequest
+from libpvarki.schemas.generic import OperationResultResponse
 
 
 LOGGER = logging.getLogger(__name__)

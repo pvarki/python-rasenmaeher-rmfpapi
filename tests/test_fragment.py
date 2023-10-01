@@ -20,8 +20,10 @@ def test_get_fragment(norppa11: Dict[str, str], mtlsclient: TestClient) -> None:
     resp = mtlsclient.post("/api/v1/clients/fragment", json=norppa11)
     assert resp.status_code == 200
     payload = resp.json()
-    assert "html" in payload
-    assert payload["html"] == "<p>Hello NORPPA11a!</p>"
+    for fpl in payload:
+        assert fpl["title"]
+        assert fpl["filename"]
+        assert fpl["data"]
 
 
 def test_get_admin_fragment(mtlsclient: TestClient) -> None:

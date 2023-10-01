@@ -1,22 +1,43 @@
 """Endpoints for information for the end-user"""
+from typing import List, Dict
 import logging
+import io
+import zipfile
+import base64
 
 from fastapi import APIRouter, Depends
 from libpvarki.middleware import MTLSHeader
-from libpvarki.schemas.product import UserInstructionFragment, UserCRUDRequest
-from jinja2 import Environment, FileSystemLoader
-
-from ..config import TEMPLATES_PATH
+from libpvarki.schemas.product import UserCRUDRequest
 
 LOGGER = logging.getLogger(__name__)
 
 router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 
 
+def zip_pem(pem: str, filename: str) -> bytes:
+    """in-memory zip of the pem"""
+    zip_buffer = io.BytesIO()
+    with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED, False) as zip_file:
+        zip_file.writestr(filename, pem)
+    return zip_buffer.getvalue()
+
+
 @router.post("/fragment")
-async def client_instruction_fragment(user: UserCRUDRequest) -> UserInstructionFragment:
+async def client_instruction_fragment(user: UserCRUDRequest) -> List[Dict[str, str]]:
     """Return user instructions, we use POST because the integration layer might not keep
     track of callsigns and certs by UUID and will probably need both for the instructions"""
-    template = Environment(loader=FileSystemLoader(TEMPLATES_PATH), autoescape=True).get_template("clientinfo.html")
-    result = UserInstructionFragment(html=template.render(**user.dict()))
-    return result
+    zip1_bytes = zip_pem(user.x509cert, f"{user.callsign}_1.pem")
+    zip2_bytes = zip_pem(user.x509cert, f"{user.callsign}_2.pem")
+
+    return [
+        {
+            "title": "iTAK",
+            "data": f"data:application/zip;base64,{base64.b64encode(zip1_bytes)}",
+            "filename": f"{user.callsign}_1.zip",
+        },
+        {
+            "title": "ATAK",
+            "data": f"data:application/zip;base64,{base64.b64encode(zip2_bytes)}",
+            "filename": f"{user.callsign}_2.zip",
+        },
+    ]

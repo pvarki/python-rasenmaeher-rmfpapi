@@ -1,6 +1,8 @@
 """Test the HTML fragment"""
 from typing import Dict
 import logging
+import base64
+
 from fastapi.testclient import TestClient
 
 from .conftest import APP
@@ -24,6 +26,11 @@ def test_get_fragment(norppa11: Dict[str, str], mtlsclient: TestClient) -> None:
         assert fpl["title"]
         assert fpl["filename"]
         assert fpl["data"]
+        data = str(fpl["data"])
+        assert data.startswith("data:")
+        _, b64data = data.split(",")
+        dec = base64.b64decode(b64data)
+        assert dec
 
 
 def test_get_admin_fragment(mtlsclient: TestClient) -> None:

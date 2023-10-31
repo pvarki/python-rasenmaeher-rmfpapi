@@ -1,5 +1,9 @@
 #!/bin/bash -l
 set -e
+
+# TODO On compose localmaeher.pvarki.fi isn't up even depends on are there. need to figure out what is needed to compose so we can get rid of this sleep...
+sleep 20
+
 # Resolve our magic names to docker internal ip
 sed 's/.*localmaeher.*//g' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts
 echo "$(getent hosts rmnginx | awk '{ print $1 }') localmaeher.pvarki.fi mtls.localmaeher.pvarki.fi" >>/etc/hosts

@@ -31,12 +31,12 @@ async def client_instruction_fragment(user: UserCRUDRequest) -> List[Dict[str, s
 
     return [
         {
-            "title": "iTAK",
+            "title": "iFake",
             "data": f"data:application/zip;base64,{base64.b64encode(zip1_bytes).decode('ascii')}",
             "filename": f"{user.callsign}_1.zip",
         },
         {
-            "title": "ATAK",
+            "title": "aFake",
             "data": f"data:application/zip;base64,{base64.b64encode(zip2_bytes).decode('ascii')}",
             "filename": f"{user.callsign}_2.zip",
         },

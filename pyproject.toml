@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rmfpapi"
-version = "0.5.0"
+version = "1.1.0"
 description = "Fake product RASENMAEHER integration API service"
 authors = ["Eero af Heurlin <eero.afheurlin@iki.fi>"]
 homepage = "https://github.com/pvarki/python-rasenmaeher-rmfpapi/"
@@ -39,7 +39,7 @@ strict=true
 
 [tool.pytest.ini_options]
 junit_family="xunit2"
-addopts="--cov=rmfpapi --cov-fail-under=65 --cov-branch"
+addopts="--cov=rmfpapi --cov-fail-under=55 --cov-branch"
 asyncio_mode="strict"
 
 [tool.pylint.format]

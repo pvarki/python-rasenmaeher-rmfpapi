@@ -1174,7 +1174,7 @@ http = ["frozendict (>=2.3,<3.0)", "requests (>=2.28,<3.0)"]
 
 [[package]]
 name = "libpvarki"
-version = "1.7.0"
+version = "1.10.0"
 description = "Common helpers like standard logging init"
 optional = false
 python-versions = "^3.8"
@@ -1196,8 +1196,8 @@ pyopenssl = "^23.2"
 [package.source]
 type = "git"
 url = "https://github.com/pvarki/python-libpvarki.git"
-reference = "1.7.0"
-resolved_reference = "0eb59a56beab22964e065384d1b0ea838ab53527"
+reference = "csr_ocsp"
+resolved_reference = "219ebb41c8aee3ab74f2a24502950395567faef6"
 
 [[package]]
 name = "markdown-it-py"
@@ -2468,4 +2468,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<4.0"
-content-hash = "86a7940bfc856104657e5d504930e5cc69276a75aaed75ae81f75ceb9257613a"
+content-hash = "19d5d47dcf20f96234146a3dac15ca6b94c0a2bfd05eecd4123ad84e9120bcf6"

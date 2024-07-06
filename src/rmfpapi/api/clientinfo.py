@@ -22,7 +22,7 @@ def zip_pem(pem: str, filename: str) -> bytes:
     return zip_buffer.getvalue()
 
 
-@router.post("/fragment")
+@router.post("/fragment", deprecated=True)
 async def client_instruction_fragment(user: UserCRUDRequest) -> List[Dict[str, str]]:
     """Return user instructions, we use POST because the integration layer might not keep
     track of callsigns and certs by UUID and will probably need both for the instructions"""

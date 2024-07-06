@@ -32,7 +32,14 @@ class ProductDescription(BaseModel):  # pylint: disable=too-few-public-methods
 )
 async def return_product_description(language: str) -> ProductDescription:
     """Fetch description from each product in manifest"""
-    _ = language
+    if language == "fi":
+        return ProductDescription(
+            shortname="fake",
+            title="Feikkituote",
+            icon=None,
+            description=""""tuote" integraatioiden testaamiseen""",
+            language="fi",
+        )
     return ProductDescription(
         shortname="fake",
         title="Fake Product",

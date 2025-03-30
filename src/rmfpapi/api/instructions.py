@@ -1,6 +1,7 @@
 """Instructions endpoints"""
 from typing import Dict
 import logging
+import json
 from pathlib import Path
 
 from fastapi import APIRouter, Depends

@@ -89,6 +89,8 @@ RUN --mount=type=ssh source /.venv/bin/activate \
     && chmod a+x /docker-entrypoint.sh \
     && true
 
+RUN mkdir -p /opt/templates \
+    && curl -L https://github.com/pvarki/rune-fake-metadata/releases/latest/download/rune.json -o /opt/templates/rune-fake.json
 
 #########################
 # Main production build #
@@ -122,6 +124,8 @@ RUN --mount=type=ssh apt-get update && apt-get install -y \
     && true
 ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 
+RUN mkdir -p /opt/templates \
+    && curl -L https://github.com/pvarki/rune-fake-metadata/releases/latest/download/rune.json -o /opt/templates/rune-fake.json
 
 #####################################
 # Base stage for development builds #
@@ -133,6 +137,8 @@ RUN --mount=type=ssh source /.venv/bin/activate \
     && poetry install --no-interaction --no-ansi \
     && true
 
+RUN mkdir -p /opt/templates \
+    && curl -L https://github.com/pvarki/rune-fake-metadata/releases/latest/download/rune.json -o /opt/templates/rune-fake.json
 
 #0############
 # Run tests #

@@ -14,7 +14,7 @@ router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 
 
 @router.post("/{language}")
-async def user_intructions(user: UserCRUDRequest) -> Dict[str, str]:
+async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, str]:
     """return user instructions"""
     instructions_json_file = Path("/opt/templates/rune-fake.json")
     

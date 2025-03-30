@@ -71,6 +71,9 @@ RUN --mount=type=ssh pip3 install wheel virtualenv \
     && pip3 install --no-deps --find-links=/tmp/wheelhouse/ /tmp/wheelhouse/*.whl \
     && true
 
+# Add rune instructions
+RUN mkdir -p /opt/templates \
+    && curl -L https://github.com/pvarki/rune-fake-metadata/releases/latest/download/rune.json -o /opt/templates/rune-fake.json
 
 ####################################
 # Base stage for production builds #
@@ -98,6 +101,7 @@ COPY --from=production_build /tmp/wheelhouse /tmp/wheelhouse
 COPY --from=production_build /docker-entrypoint.sh /docker-entrypoint.sh
 COPY --from=production_build /container-init.sh /container-init.sh
 COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
+COPY --from=builder_base /opt/templates/rune-fake.json /opt/templates/rune-fake.json
 
 WORKDIR /app
 # Install system level deps for running the package (not devel versions for building wheels)
@@ -127,12 +131,13 @@ ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 # Base stage for development builds #
 #####################################
 FROM builder_base as devel_build
+COPY --from=builder_base /opt/templates/rune-fake.json /opt/templates/rune-fake.json
+
 # Install deps
 WORKDIR /pysetup
 RUN --mount=type=ssh source /.venv/bin/activate \
     && poetry install --no-interaction --no-ansi \
     && true
-
 
 #0############
 # Run tests #

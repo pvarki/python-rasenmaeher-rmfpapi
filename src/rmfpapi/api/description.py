@@ -2,7 +2,7 @@
 from typing import Optional
 import logging
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Extra, Field  # pylint: disable=(no-name-in-module # false-positive
 
 LOGGER = logging.getLogger(__name__)
@@ -32,6 +32,7 @@ class ProductDescription(BaseModel):  # pylint: disable=too-few-public-methods
 )
 async def return_product_description(language: str) -> ProductDescription:
     """Fetch description from each product in manifest"""
+    LOGGER.debug("Got language: {}".format(language))
     if language == "fi":
         return ProductDescription(
             shortname="fake",
@@ -40,10 +41,13 @@ async def return_product_description(language: str) -> ProductDescription:
             description=""""tuote" integraatioiden testaamiseen""",
             language="fi",
         )
-    return ProductDescription(
-        shortname="fake",
-        title="Fake Product",
-        icon=None,
-        description="Fake product for integrations testing and examples",
-        language="en",
-    )
+    if language == "en":
+        return ProductDescription(
+            shortname="fake",
+            title="Fake Product",
+            icon=None,
+            description="Fake product for integrations testing and examples",
+            language="en",
+        )
+    # NOTE: Generally should return just the default language but this is for testing purposes
+    raise HTTPException(status_code=404)

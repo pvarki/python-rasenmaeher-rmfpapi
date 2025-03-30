@@ -14,8 +14,9 @@ router = APIRouter(dependencies=[Depends(MTLSHeader(auto_error=True))])
 @router.post("/{language}")
 async def user_intructions(user: UserCRUDRequest) -> Dict[str, str]:
     """return user instructions"""
-    return {
-        "callsign": user.callsign,
-        "instructions": "FIXME: Return something sane",
-        "language": "en",
-    }
+    instructions_json_file = Path("/opt/templates/rune-fake.json")
+    
+    tak_instructions_data = json.loads(instructions_json_file.read_text(encoding="utf-8"))
+    
+    return {"callsign": user.callsign, "instructions": json.dumps(tak_instructions_data), "language": language}
+    

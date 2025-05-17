@@ -1,4 +1,6 @@
 # syntax=docker/dockerfile:1.1.7-experimental
+ARG RUNE_TAG="v1.0.6"
+
 #############################################
 # Tox testsuite for multiple python version #
 #############################################
@@ -73,7 +75,7 @@ RUN --mount=type=ssh pip3 install wheel virtualenv \
 
 # Add rune instructions
 RUN mkdir -p /opt/templates \
-    && curl -L https://github.com/pvarki/rune-fake-metadata/releases/latest/download/rune.json -o /opt/templates/rune-fake.json
+    && curl -L https://github.com/pvarki/rune-fake-metadata/releases/download/$RUNE_TAG/rune.json -o /opt/templates/rune-fake.json
 
 ####################################
 # Base stage for production builds #

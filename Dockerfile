@@ -1,4 +1,5 @@
 # syntax=docker/dockerfile:1.1.7-experimental
+
 #############################################
 # Tox testsuite for multiple python version #
 #############################################
@@ -20,6 +21,7 @@ RUN export RESOLVED_VERSIONS=`pyenv_resolve $PYTHON_VERSIONS` \
 # Base builder image #
 ######################
 FROM python:3.11-bookworm as builder_base
+ARG RUNE_TAG="v1.0.6"
 
 ENV \
   # locale
@@ -71,6 +73,10 @@ RUN --mount=type=ssh pip3 install wheel virtualenv \
     && pip3 install --no-deps --find-links=/tmp/wheelhouse/ /tmp/wheelhouse/*.whl \
     && true
 
+# Add rune instructions
+RUN mkdir -p /opt/templates \
+    && curl -L https://github.com/pvarki/rune-fake-metadata/releases/download/${RUNE_TAG}/rune.json -o /opt/templates/rune-fake.json \
+    && ls -lah /opt/templates/rune-fake.json
 
 ####################################
 # Base stage for production builds #
@@ -98,6 +104,7 @@ COPY --from=production_build /tmp/wheelhouse /tmp/wheelhouse
 COPY --from=production_build /docker-entrypoint.sh /docker-entrypoint.sh
 COPY --from=production_build /container-init.sh /container-init.sh
 COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
+COPY --from=builder_base /opt/templates/rune-fake.json /opt/templates/rune-fake.json
 
 WORKDIR /app
 # Install system level deps for running the package (not devel versions for building wheels)
@@ -127,12 +134,13 @@ ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 # Base stage for development builds #
 #####################################
 FROM builder_base as devel_build
+COPY --from=builder_base /opt/templates/rune-fake.json /opt/templates/rune-fake.json
+
 # Install deps
 WORKDIR /pysetup
 RUN --mount=type=ssh source /.venv/bin/activate \
     && poetry install --no-interaction --no-ansi \
     && true
-
 
 #0############
 # Run tests #

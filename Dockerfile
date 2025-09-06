@@ -73,11 +73,6 @@ RUN --mount=type=ssh pip3 install wheel virtualenv \
     && pip3 install --no-deps --find-links=/tmp/wheelhouse/ /tmp/wheelhouse/*.whl \
     && true
 
-# Add rune instructions
-RUN mkdir -p /opt/templates \
-    && curl -L https://github.com/pvarki/rune-fake-metadata/releases/download/${RUNE_TAG}/rune.json -o /opt/templates/rune-fake.json \
-    && ls -lah /opt/templates/rune-fake.json
-
 ####################################
 # Base stage for production builds #
 ####################################
@@ -95,6 +90,21 @@ RUN --mount=type=ssh source /.venv/bin/activate \
     && chmod a+x /docker-entrypoint.sh \
     && true
 
+################################################
+# Build RUNE instructions from local submodule #
+################################################
+FROM builder_base as rune_build
+COPY ./poetry.lock ./pyproject.toml ./README.rst /app/
+COPY ./rune /app/rune
+WORKDIR /app
+RUN --mount=type=ssh source /.venv/bin/activate \
+    && poetry install --no-interaction --no-ansi  --no-root \
+    && ls -lah -R \
+    && mkdir -p /opt/templates \
+    && cd /app/rune \
+    && rune src json >/opt/templates/rune-fake.json \
+    && true
+
 
 #########################
 # Main production build #
@@ -104,7 +114,7 @@ COPY --from=production_build /tmp/wheelhouse /tmp/wheelhouse
 COPY --from=production_build /docker-entrypoint.sh /docker-entrypoint.sh
 COPY --from=production_build /container-init.sh /container-init.sh
 COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
-COPY --from=builder_base /opt/templates/rune-fake.json /opt/templates/rune-fake.json
+COPY --from=rune_build /opt/templates/rune-fake.json /opt/templates/rune-fake.json
 
 WORKDIR /app
 # Install system level deps for running the package (not devel versions for building wheels)
@@ -134,7 +144,8 @@ ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 # Base stage for development builds #
 #####################################
 FROM builder_base as devel_build
-COPY --from=builder_base /opt/templates/rune-fake.json /opt/templates/rune-fake.json
+COPY --from=rune_build /opt/templates/rune-fake.json /opt/templates/rune-fake.json
+COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
 
 # Install deps
 WORKDIR /pysetup
@@ -162,7 +173,6 @@ RUN --mount=type=ssh source /.venv/bin/activate \
 ###########
 FROM devel_build as devel_shell
 # Copy everything to the image
-COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
 COPY . /app
 WORKDIR /app
 RUN apt-get update && apt-get install -y zsh \
@@ -170,7 +180,7 @@ RUN apt-get update && apt-get install -y zsh \
     && echo "source /root/.profile" >>/root/.zshrc \
     && pip3 install git-up \
     # Map the special names to docker host internal ip because 127.0.0.1 is *container* localhost on login
-    && echo "sed 's/.*localmaeher.*//g' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts" >>/root/.profile \
+    && echo "awk '!/.*localmaeher.*/' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts" >>/root/.profile \
     && echo "echo \"\$(getent hosts host.docker.internal | awk '{ print $1 }') localmaeher.dev.pvarki.fi mtls.localmaeher.dev.pvarki.fi\" >>/etc/hosts" >>/root/.profile \
     && ln -s /app/docker/container-init.sh /container-init.sh \
     && true

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rmfpapi"
-version = "1.4.0"
+version = "1.5.0"
 description = "Fake product RASENMAEHER integration API service"
 authors = ["Eero af Heurlin <eero.afheurlin@iki.fi>"]
 homepage = "https://github.com/pvarki/python-rasenmaeher-rmfpapi/"

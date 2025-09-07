@@ -1,4 +1,5 @@
 """Package level tests"""
+
 from fastapi.testclient import TestClient
 from rmfpapi import __version__
 

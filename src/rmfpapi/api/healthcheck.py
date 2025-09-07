@@ -1,4 +1,5 @@
 """Health-check endpooint(s)"""
+
 import logging
 
 from fastapi import APIRouter, Depends

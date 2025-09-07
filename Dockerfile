@@ -103,6 +103,7 @@ RUN --mount=type=ssh source /.venv/bin/activate \
     && mkdir -p /opt/templates \
     && cd /app/rune \
     && rune src json >/opt/templates/rune-fake.json \
+    && dataurlexport /opt/templates/rune-fake.json __FAKE_ASSETS__ \
     && true
 
 
@@ -114,7 +115,7 @@ COPY --from=production_build /tmp/wheelhouse /tmp/wheelhouse
 COPY --from=production_build /docker-entrypoint.sh /docker-entrypoint.sh
 COPY --from=production_build /container-init.sh /container-init.sh
 COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
-COPY --from=rune_build /opt/templates/rune-fake.json /opt/templates/rune-fake.json
+COPY --from=rune_build /opt/templates/ /opt/templates/
 
 WORKDIR /app
 # Install system level deps for running the package (not devel versions for building wheels)
@@ -144,7 +145,7 @@ ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 # Base stage for development builds #
 #####################################
 FROM builder_base as devel_build
-COPY --from=rune_build /opt/templates/rune-fake.json /opt/templates/rune-fake.json
+COPY --from=rune_build /opt/templates/ /opt/templates/
 COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
 
 # Install deps

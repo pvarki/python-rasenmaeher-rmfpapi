@@ -1,6 +1,6 @@
 """Instructions endpoints"""
 
-from typing import Dict
+from typing import Dict, Any
 import logging
 import json
 from pathlib import Path
@@ -29,7 +29,7 @@ async def get_asset(file_path: str) -> FileResponse:
 
 
 @router.post("/{language}")
-async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, str]:
+async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, Any]:
     """return user instructions"""
     instructions_json_file = Path("/opt/templates/rune-fake.json")
     manifest = load_manifest()

@@ -40,4 +40,4 @@ async def user_intructions(user: UserCRUDRequest, language: str) -> Dict[str, st
     )
     instructions_data = json.loads(instructions_text)
 
-    return {"callsign": user.callsign, "instructions": json.dumps(instructions_data), "language": language}
+    return {"callsign": user.callsign, "instructions": instructions_data, "language": language}

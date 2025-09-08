@@ -106,4 +106,4 @@ RUNE instructions compile
 
 tldr::
 
-    rune rune/src json >rune/output/rune.json ; dataurlexport rune/output/rune.json __FAKE_ASSETS__
+    rune rune/src json >rune/output/rune-fake.json ; dataurlexport -v rune/output/rune-fake.json __FAKE_ASSETS__

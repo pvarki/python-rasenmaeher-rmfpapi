@@ -23,4 +23,3 @@ all_routers.include_router(instructions_router, prefix="/instructions", tags=["i
 all_routers_v2 = APIRouter()
 all_routers_v2.include_router(description_router_v2, prefix="/description", tags=["description"])
 all_routers_v2.include_router(userinfo_router, prefix="/clients", tags=["clients"])
-

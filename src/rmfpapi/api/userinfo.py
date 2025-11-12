@@ -2,7 +2,7 @@
 
 import base64
 import logging
-from typing import Any, List
+from typing import List
 from fastapi import APIRouter, Depends
 from libpvarki.middleware import MTLSHeader
 from libpvarki.schemas.product import UserCRUDRequest
@@ -20,13 +20,13 @@ class ClientInstructionData(BaseModel):  # pylint: disable=too-few-public-method
     title: str = Field(..., description="Original filename or title of the zip file.")
     filename: str = Field(..., description="Filename used for download, includes user callsign.")
     data: str = Field(
-        ..., description="Base64-encoded zip file contents", example="data:application/zip;base64,UEsDBBQAAAAI..."
+        ..., description="Base64-encoded zip file contents", examples=["data:application/zip;base64,UEsDBBQAAAAI..."]
     )
 
     class Config:  # pylint: disable=too-few-public-methods
         """Pydantic configs"""
 
-        extra = 'forbid'
+        extra = "forbid"
 
 
 # TODO move to libpvarki
@@ -38,7 +38,7 @@ class ClientInstructionResponse(BaseModel):  # pylint: disable=too-few-public-me
     class Config:  # pylint: disable=too-few-public-methods
         """Pydantic configs"""
 
-        extra = 'forbid'
+        extra = "forbid"
 
 
 @router.post("/data", response_model=ClientInstructionResponse)
@@ -50,15 +50,15 @@ async def client_instruction_data(user: UserCRUDRequest) -> ClientInstructionRes
 
     return ClientInstructionResponse(
         data=[
-            {
-                "title": "iFake",
-                "data": f"data:application/zip;base64,{base64.b64encode(zip1_bytes).decode('ascii')}",
-                "filename": f"{user.callsign}_1.zip",
-            },
-            {
-                "title": "aFake",
-                "data": f"data:application/zip;base64,{base64.b64encode(zip2_bytes).decode('ascii')}",
-                "filename": f"{user.callsign}_2.zip",
-            },
+            ClientInstructionData(
+                title="iFake",
+                data=f"data:application/zip;base64,{base64.b64encode(zip1_bytes).decode('ascii')}",
+                filename=f"{user.callsign}_1.zip",
+            ),
+            ClientInstructionData(
+                title="aFake",
+                data=f"data:application/zip;base64,{base64.b64encode(zip2_bytes).decode('ascii')}",
+                filename=f"{user.callsign}_2.zip",
+            ),
         ]
     )

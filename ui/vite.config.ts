@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { federation } from '@module-federation/vite';
 import path from 'path';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig(({ mode }) => {
   const isProd = mode === 'production';
@@ -21,6 +22,7 @@ export default defineConfig(({ mode }) => {
         },
         runtime: '@module-federation/enhanced/runtime',
       }),
+      tailwindcss(),
     ],
     build: {
       target: 'esnext',
@@ -32,6 +34,11 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: { '@': path.resolve(__dirname, './src') },
+    },
+    define: {
+      __USE_GLOBAL_CSS__: JSON.stringify(
+        process.env.VITE_USE_GLOBAL_CSS === "true",
+      ),
     },
   };
 });

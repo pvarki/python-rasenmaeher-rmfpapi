@@ -1,5 +1,3 @@
-import { Card, CardDescription, CardHeader, CardTitle } from './components/ui/card';
-
 //Match the user data format /api gives
 interface Props{
     data?: {
@@ -10,14 +8,11 @@ interface Props{
 export default ({data}: Props) => {
 
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Fake Product Component</CardTitle>
-                <CardDescription>
-                    <p>This is a minimal federated component inside the Fake Product integration with shadcn + tailwindcss.</p>
-                    <p className='font-bold'>{data ? "This component received props." : "This component didn't receive any props"}</p>
-                </CardDescription>
-            </CardHeader>
-        </Card>
+        <div className="flex items-center h-svh">
+            <div className="text-center w-full">
+                <p>This is a minimal federated component inside the Fake Product integration with tailwindcss.</p>
+                <p className='font-bold'>{data ? "This component received props." : "This component didn't receive any props"}</p>
+            </div>
+        </div>
     );
 };

@@ -4,32 +4,6 @@ rmfpapi
 
 Fake product RASENMAEHER integration API service. Serves as a reference implementation for a new integration into the deploy app ecosystem.
 
-Helpful Tips for Using this Repo as a Reference
------------------------------------------------
-
-Each integration repository should include the API endpoints defined under the directory `src`, and a ui component under the directory `ui`
-
-User Interface
-^^^^^^^^^^^^^^
-
-In the example here, we add a federated component through module federation + vite. In the wider `docker-rasenmaher-integration` context, there is a
-shared docker volume `ui_files`. In production and local modes, the flow is as follows:
-
-`Dockerfile`:
-- Build and vite UI (into `ui/dist`)
-- Copy `ui/dist` into `ui_build`
-`entrypoint.sh`:
-- Copy `ui_build` into docker volume `ui_files/{shortname}`
-
-The last step is important if we want changes to the UI to reflect new builds without destroying the docker volumes in between, which is
-desirable when developing. In development mode, the `entrypoint.sh` script is not used, and we must instead add the step of copying to
-the docker volume to the command in the docker compose file (in `docker-rasenmaher-integration`).
-
-For an integration to work correctly, we need to have consistency with the naming schemes. Especially the shortname needs to be consistent between
-the URL where the API is found and the directory where the UI is stored within the docker volume. For this project, as an example, the shortname
-is "fake"
-
-
 Docker
 ------
 

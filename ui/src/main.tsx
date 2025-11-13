@@ -8,8 +8,6 @@ if(__USE_GLOBAL_CSS__ == true){
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <React.StrictMode >
-        <div className='dark m-4'>
-            <App />
-        </div>
+        <App />
     </React.StrictMode>,
 );

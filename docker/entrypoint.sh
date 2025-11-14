@@ -4,7 +4,7 @@
 mkdir -p /ui_files/fake
 if [ -d "/ui_build" ]; then
     echo "Copying UI files from /ui_build → /ui_files/fake ..."
-    cp /ui_build/* /ui_files/fake/
+    cp -r /ui_build/* /ui_files/fake/
 else
     echo "No UI found at /ui_build, skipping copy."
 fi

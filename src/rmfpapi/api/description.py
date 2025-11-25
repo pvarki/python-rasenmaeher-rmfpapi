@@ -7,6 +7,8 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field, Extra
 from libpvarki.schemas.product import ProductDescription
 
+from ..config import get_manifest
+
 LOGGER = logging.getLogger(__name__)
 
 router = APIRouter()  # These endpoints are public
@@ -71,6 +73,9 @@ async def return_product_description(language: str) -> ProductDescription:
 async def return_product_description_extended(language: str) -> ProductDescriptionExtended:
     """Fetch description from each product in manifest"""
     shortname = "fake"
+    manifest = get_manifest()
+    api_base = manifest["product"]["api"]
+    md_url = f"{api_base}api/v2/clients/{language}/info.md"
 
     if language == "fi":
         return ProductDescriptionExtended(
@@ -80,7 +85,7 @@ async def return_product_description_extended(language: str) -> ProductDescripti
             description=""""tuote" integraatioiden testaamiseen""",
             language=language,
             docs="https://pvarki.github.io/Docusaurus-docs/docs/android/deployapp/home/",
-            component=ProductComponent(type="component", ref=f"/ui/{shortname}/remoteEntry.js"),
+            component=ProductComponent(type="markdown", ref=md_url),
         )
     if language == "sv":
         return ProductDescriptionExtended(
@@ -90,7 +95,7 @@ async def return_product_description_extended(language: str) -> ProductDescripti
             description="Falsk produkt för integrationstestning och exempel",
             language=language,
             docs="https://pvarki.github.io/Docusaurus-docs/docs/android/deployapp/home/",
-            component=ProductComponent(type="component", ref=f"/ui/{shortname}/remoteEntry.js"),
+            component=ProductComponent(type="markdown", ref=md_url),
         )
     return ProductDescriptionExtended(
         shortname=shortname,
@@ -99,5 +104,5 @@ async def return_product_description_extended(language: str) -> ProductDescripti
         description="Fake product for integrations testing and examples",
         language=language,
         docs="https://pvarki.github.io/Docusaurus-docs/docs/android/deployapp/home/",
-        component=ProductComponent(type="component", ref=f"/ui/{shortname}/remoteEntry.js"),
+        component=ProductComponent(type="markdown", ref=md_url),
     )

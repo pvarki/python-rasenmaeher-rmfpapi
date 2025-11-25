@@ -119,9 +119,6 @@ RUN --mount=type=ssh apt-get update && apt-get install -y \
     && pip3 install --find-links=/tmp/wheelhouse/ "$WHEELFILE"[all] \
     && rm -rf /tmp/wheelhouse/ \
     # Do whatever else you need to
-    # Map the special names to docker host internal ip because 127.0.0.1 is *container* localhost on login
-    && echo "sed 's/.*localmaeher.*//g' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts" >>/root/.profile \
-    && echo "echo \"\$(getent hosts host.docker.internal | awk '{ print $1 }') localmaeher.dev.pvarki.fi mtls.localmaeher.dev.pvarki.fi\" >>/etc/hosts" >>/root/.profile \
     && true
 ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 
@@ -170,9 +167,6 @@ RUN apt-get update && apt-get install -y zsh \
     && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" \
     && echo "source /root/.profile" >>/root/.zshrc \
     && pip3 install git-up \
-    # Map the special names to docker host internal ip because 127.0.0.1 is *container* localhost on login
-    && echo "sed 's/.*localmaeher.*//g' /etc/hosts >/etc/hosts.new && cat /etc/hosts.new >/etc/hosts" >>/root/.profile \
-    && echo "echo \"\$(getent hosts host.docker.internal | awk '{ print $1 }') localmaeher.dev.pvarki.fi mtls.localmaeher.dev.pvarki.fi\" >>/etc/hosts" >>/root/.profile \
     && ln -s /app/docker/container-init.sh /container-init.sh \
     && true
 ENTRYPOINT ["/bin/zsh", "-l"]

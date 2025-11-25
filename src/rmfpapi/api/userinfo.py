@@ -5,6 +5,7 @@ import logging
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import PlainTextResponse
 from libpvarki.middleware import MTLSHeader
+from libpvarki.schemas.product import UserCRUDRequest
 
 from ..config import get_manifest
 
@@ -19,10 +20,10 @@ def get_callsign(request: Request) -> str:
     return str(payload.get("CN"))
 
 
-@router.get("/{language}/info.md", response_class=PlainTextResponse)
-async def get_info(request: Request, language: str) -> str:
+@router.post("/{language}/info.md", response_class=PlainTextResponse)
+async def get_info(language: str, user: UserCRUDRequest) -> str:
     """Return customized markdown"""
-    callsign = get_callsign(request)
+    callsign = user.callsign
     manifest = get_manifest()
     dname = manifest.get("deployment")
     if language == "fi":

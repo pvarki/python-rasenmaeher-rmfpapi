@@ -45,10 +45,10 @@ def test_get_admin_fragment(mtlsclient: TestClient) -> None:
 
 
 @pytest.mark.parametrize("lang", ["en", "fi", "sv"])
-def test_get_v2_user_markdown(mtlsclient: TestClient, lang: str) -> None:
+def test_get_v2_user_markdown(norppa11: Dict[str, str], mtlsclient: TestClient, lang: str) -> None:
     """Check that getting v2 user markdown works"""
     manifest = get_manifest()
     dname = manifest["deployment"]
-    resp = mtlsclient.get(f"/api/v2/clients/{lang}/info.md")
+    resp = mtlsclient.post(f"/api/v2/clients/{lang}/info.md", json=norppa11)
     assert resp.status_code == 200
     assert dname in resp.text

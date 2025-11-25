@@ -4,7 +4,9 @@ import logging
 import base64
 
 from fastapi.testclient import TestClient
+import pytest
 
+from rmfpapi.config import get_manifest
 from .conftest import APP
 
 LOGGER = logging.getLogger(__name__)
@@ -40,3 +42,13 @@ def test_get_admin_fragment(mtlsclient: TestClient) -> None:
     payload = resp.json()
     assert "html" in payload
     assert payload["html"] == "<p>Hello to the admin</p>"
+
+
+@pytest.mark.parametrize("lang", ["en", "fi", "sv"])
+def test_get_v2_user_markdown(mtlsclient: TestClient, lang: str) -> None:
+    """Check that getting v2 user markdown works"""
+    manifest = get_manifest()
+    dname = manifest["deployment"]
+    resp = mtlsclient.get(f"/api/v2/clients/{lang}/info.md")
+    assert resp.status_code == 200
+    assert dname in resp.text

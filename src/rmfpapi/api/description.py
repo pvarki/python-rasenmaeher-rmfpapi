@@ -90,6 +90,7 @@ async def return_product_description_extended(language: str) -> ProductDescripti
     manifest = get_manifest()
     api_base = manifest["product"]["api"]
     md_url = f"{api_base}api/v2/clients/{language}/info.md"
+    docs_url = "https://pvarki.github.io/Docusaurus-docs/docs/android/deployapp/home/"
 
     if language == "fi":
         return ProductDescriptionExtended(
@@ -98,7 +99,7 @@ async def return_product_description_extended(language: str) -> ProductDescripti
             icon=None,
             description=""""tuote" integraatioiden testaamiseen""",
             language=language,
-            docs="https://pvarki.github.io/Docusaurus-docs/docs/android/deployapp/home/",
+            docs=docs_url,
             component=ProductComponent(type="markdown", ref=md_url),
         )
     if language == "sv":
@@ -108,7 +109,7 @@ async def return_product_description_extended(language: str) -> ProductDescripti
             icon=None,
             description="Falsk produkt för integrationstestning och exempel",
             language=language,
-            docs="https://pvarki.github.io/Docusaurus-docs/docs/android/deployapp/home/",
+            docs=docs_url,
             component=ProductComponent(type="markdown", ref=md_url),
         )
     return ProductDescriptionExtended(
@@ -117,6 +118,6 @@ async def return_product_description_extended(language: str) -> ProductDescripti
         icon=None,
         description="Fake product for integrations testing and examples",
         language=language,
-        docs="https://pvarki.github.io/Docusaurus-docs/docs/android/deployapp/home/",
+        docs=docs_url,
         component=ProductComponent(type="markdown", ref=md_url),
     )

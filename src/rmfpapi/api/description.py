@@ -5,7 +5,6 @@ import logging
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Extra, Field  # pylint: disable=(no-name-in-module # false-positive
 
-from ..config import get_manifest
 
 LOGGER = logging.getLogger(__name__)
 
@@ -87,9 +86,7 @@ async def return_product_description(language: str) -> ProductDescription:
 async def return_product_description_extended(language: str) -> ProductDescriptionExtended:
     """Fetch description from each product in manifest"""
     shortname = "fake"
-    manifest = get_manifest()
-    api_base = manifest["product"]["api"]
-    md_url = f"{api_base}api/v2/clients/{language}/info.md"
+    md_url = f"/api/v1/product/proxy/fake/api/v2/clients/{language}/info.md"
     docs_url = "https://pvarki.github.io/Docusaurus-docs/docs/android/deployapp/home/"
 
     if language == "fi":

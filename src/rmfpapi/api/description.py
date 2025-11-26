@@ -1,4 +1,5 @@
 """Descriptions API"""
+
 from typing import Literal, Optional
 import logging
 

@@ -1,4 +1,5 @@
 """Endpoints for information for the end-user"""
+
 from typing import List, Dict
 import logging
 import io

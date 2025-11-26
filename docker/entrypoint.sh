@@ -1,4 +1,5 @@
 #!/bin/bash -l
+# shellcheck disable=SC1091
 . /container-init.sh
 
 set -e

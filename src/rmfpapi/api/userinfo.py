@@ -8,6 +8,7 @@ from libpvarki.middleware import MTLSHeader
 from libpvarki.schemas.product import UserCRUDRequest
 
 from ..config import get_manifest
+from .usercrud import comes_from_rm
 
 LOGGER = logging.getLogger(__name__)
 
@@ -21,8 +22,13 @@ def get_callsign(request: Request) -> str:
 
 
 @router.post("/{language}/info.md", response_class=PlainTextResponse)
-async def get_info(language: str, user: UserCRUDRequest) -> str:
+async def get_info(
+    language: str,
+    user: UserCRUDRequest,
+    request: Request,
+) -> str:
     """Return customized markdown"""
+    comes_from_rm(request)
     callsign = user.callsign
     manifest = get_manifest()
     dname = manifest.get("deployment")

@@ -1,4 +1,5 @@
-""""factory for the fastpi app"""
+""" "factory for the fastpi app"""
+
 import logging
 
 from fastapi import FastAPI

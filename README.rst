@@ -2,8 +2,7 @@
 rmfpapi
 =======
 
-Fake product RASENMAEHER integration API service
-
+Fake product RASENMAEHER integration API service. Serves as a reference implementation for a new integration into the deploy app ecosystem.
 
 Docker
 ------
@@ -81,7 +80,7 @@ Development
 
 TLDR:
 
-- Create and activate a Python 3.8 virtualenv (assuming virtualenvwrapper)::
+- Create and activate a Python 3.11 virtualenv (assuming virtualenvwrapper)::
 
     mkvirtualenv -p `which python3.11` my_virtualenv
 

@@ -1,4 +1,5 @@
 """CLI entrypoints for fake product integration api"""
+
 import asyncio
 import logging
 import json

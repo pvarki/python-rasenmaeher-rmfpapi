@@ -1,4 +1,5 @@
 """pytest automagics"""
+
 from typing import Generator, Dict
 import logging
 import os
@@ -9,6 +10,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from rmfpapi.app import get_app
+from rmfpapi.config import get_manifest
 
 # Default is "ecs" and it's not great for tests
 os.environ["LOG_CONSOLE_FORMATTER"] = "local"
@@ -24,6 +26,20 @@ def mtlsclient() -> Generator[TestClient, None, None]:
         APP,
         headers={
             "X-ClientCert-DN": "CN=harjoitus1.pvarki.fi,O=harjoitus1.pvarki.fi,L=KeskiSuomi,ST=Jyvaskyla,C=FI",
+        },
+    )
+    yield client
+
+
+@pytest.fixture
+def rm_mtlsclient() -> Generator[TestClient, None, None]:
+    """Fake the NGinx header"""
+    manifest = get_manifest()
+    rm_cn = manifest["rasenmaeher"]["certcn"]
+    client = TestClient(
+        APP,
+        headers={
+            "X-ClientCert-DN": f"CN={rm_cn},O=harjoitus1.pvarki.fi,L=KeskiSuomi,ST=Jyvaskyla,C=FI",
         },
     )
     yield client

@@ -47,15 +47,19 @@ In the shell you can start the uvicorn devel server with (binding to 0.0.0.0 is 
 pre-commit considerations
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If working in Docker instead of native env you need to run the pre-commit checks in docker too::
+Hooks are managed with prek_, a Rust-based drop-in replacement for pre-commit that reads the same
+``.pre-commit-config.yaml``. If working in Docker instead of native env you need to run the checks
+in docker too::
 
-    docker exec -i rmfpapi_devel /bin/bash -c "pre-commit install  --install-hooks"
-    docker exec -i rmfpapi_devel /bin/bash -c "pre-commit run --all-files"
+    docker exec -i rmfpapi_devel /bin/bash -c "prek install --install-hooks"
+    docker exec -i rmfpapi_devel /bin/bash -c "prek run --all-files"
 
 You need to have the container running, see above. Or alternatively use the docker run syntax but using
 the running container is faster::
 
-    docker run --rm -it -v `pwd`":/app" rmfpapi:devel_shell -c "pre-commit run --all-files"
+    docker run --rm -it -v `pwd`":/app" rmfpapi:devel_shell -c "prek run --all-files"
+
+.. _prek: https://github.com/j178/prek
 
 Test suite
 ^^^^^^^^^^
@@ -92,8 +96,8 @@ TLDR:
 - Install project deps and pre-commit hooks::
 
     uv sync
-    uv run pre-commit install --install-hooks
-    uv run pre-commit run --all-files
+    uv run prek install --install-hooks
+    uv run prek run --all-files
 
 - Ready to go.
 

@@ -12,7 +12,7 @@ service integration, copy this repo as a starting point.
 - **Framework:** FastAPI + Uvicorn
 - **Key libs:** libpvarki (internal), pydantic v2
 - **Testing:** pytest, tox (55% minimum coverage)
-- **Linting:** pre-commit, pylint
+- **Linting:** prek (pre-commit-compatible), pylint
 - **Container:** Docker multi-target (devel_shell, tox, production)
 - **Port:** 8001
 
@@ -37,9 +37,9 @@ docker run --rm -it -v $(pwd):/app $(echo $DOCKER_SSHAGENT) rasenmaeher_fpapi:to
 # Direct pytest inside devel_shell
 pytest tests/ -v --cov=rasenmaeher_fpapi --cov-fail-under=55
 
-# Pre-commit
-pre-commit install --install-hooks
-pre-commit run --all-files
+# Pre-commit (runs via prek)
+prek install --install-hooks
+prek run --all-files
 ```
 
 ## Code Conventions

@@ -77,7 +77,10 @@ COPY ./docker/container-init.sh /container-init.sh
 COPY ./uv.lock ./pyproject.toml ./README.rst /app/
 COPY ./src /app/src
 WORKDIR /app
-RUN --mount=type=ssh uv sync --frozen --no-dev --no-editable \
+# Build the wheel package with uv
+RUN --mount=type=ssh source /.venv/bin/activate \
+    && mkdir -p /tmp/wheelhouse \
+    && uv build --wheel --out-dir /tmp/wheelhouse \
     && chmod a+x /docker-entrypoint.sh \
     && chmod a+x /container-init.sh \
     && true
@@ -87,11 +90,10 @@ RUN --mount=type=ssh uv sync --frozen --no-dev --no-editable \
 # Main production build #
 #########################
 FROM python:3.11-slim-bookworm AS production
-COPY --from=production_build /.venv /.venv
+COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
+COPY --from=production_build /tmp/wheelhouse /tmp/wheelhouse
 COPY --from=production_build /docker-entrypoint.sh /docker-entrypoint.sh
 COPY --from=production_build /container-init.sh /container-init.sh
-COPY --from=pvarki/kw_product_init:latest /kw_product_init /kw_product_init
-ENV PATH="/.venv/bin:$PATH"
 WORKDIR /app
 RUN --mount=type=ssh apt-get update && apt-get install -y \
         bash \
@@ -103,6 +105,9 @@ RUN --mount=type=ssh apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/* \
     && chmod a+x /docker-entrypoint.sh \
     && chmod a+x /container-init.sh \
+    && WHEELFILE=`echo /tmp/wheelhouse/rmfpapi-*.whl` \
+    && pip3 install --index-url https://nexus.dev.pvarki.fi/repository/python/simple "$WHEELFILE" \
+    && rm -rf /tmp/wheelhouse/ \
     && true
 ENTRYPOINT ["/usr/bin/tini", "--", "/docker-entrypoint.sh"]
 

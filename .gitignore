@@ -130,9 +130,11 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json
+.ruff_cache
 
 # Pyre type checker
 .pyre/
 
 node_modules
 .__mf__temp
+.prettier_cache

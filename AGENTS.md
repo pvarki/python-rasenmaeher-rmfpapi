@@ -1,6 +1,7 @@
 # AGENTS.md — python-rasenmaeher-fpapi (fpintegration)
 
 ## Purpose
+
 The **reference product integration API** for Deploy App (RASENMAEHER). `fpintegration` is a
 template / fake-product implementation that demonstrates how to write a new service integration.
 It shows the exact API contract a product must implement to participate in the Deploy App
@@ -8,6 +9,7 @@ ecosystem (user lifecycle callbacks, UI card endpoint, mTLS setup). When adding 
 service integration, copy this repo as a starting point.
 
 ## Stack & Key Technologies
+
 - **Language:** Python 3.11
 - **Framework:** FastAPI + Uvicorn
 - **Key libs:** libpvarki (internal), pydantic v2
@@ -17,6 +19,7 @@ service integration, copy this repo as a starting point.
 - **Port:** 8001
 
 ## Development Setup
+
 ```bash
 export DOCKER_BUILDKIT=1
 # Linux SSH agent forwarding:
@@ -29,6 +32,7 @@ docker start -i rasenmaeher_fpapi_devel
 ```
 
 ## Running Tests
+
 ```bash
 # Via tox (CI)
 docker build --ssh default --target tox -t rasenmaeher_fpapi:tox .
@@ -43,11 +47,14 @@ prek run --all-files
 ```
 
 ## Code Conventions
+
 - Follow pylint rules from root `pylintrc`
 - New product integrations should replicate this repo's structure and naming pattern
 
 ## Architecture Notes
+
 **Integration API contract** (endpoints every product integration must implement):
+
 - `POST /api/v1/users/created` — Called when a user is enrolled; provision access
 - `POST /api/v1/users/revoked` — Called when a user is removed; revoke access
 - `POST /api/v1/users/promoted` — Called when a user is given admin role
@@ -66,6 +73,7 @@ it only validates the integration contract. Use it to test the full enrollment f
 a real product backend.
 
 ## Common Agent Pitfalls
+
 1. **This repo is a template, not a real product.** Do not add business logic here. Clone it
    for new real integrations; leave `fpintegration` as the reference implementation.
 2. **mTLS certificates are required for all user lifecycle callbacks.** If you skip mTLS
@@ -77,6 +85,7 @@ a real product backend.
 4. **Coverage threshold is 55%.** Any new route without tests will fail CI.
 
 ## Related Repos
+
 - https://github.com/pvarki/docker-rasenmaeher-integration (orchestration root)
 - https://github.com/pvarki/python-rasenmaeher-api (calls the lifecycle callbacks)
 - https://github.com/pvarki/python-miniwerk (writes the kraftwerk manifest)

@@ -1865,7 +1865,7 @@ wheels = [
 
 [[package]]
 name = "rmfpapi"
-version = "1.4.2+260427"
+version = "1.5.0+260512"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },

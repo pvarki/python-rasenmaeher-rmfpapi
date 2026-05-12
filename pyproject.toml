@@ -1,6 +1,6 @@
 [project]
 name = "rmfpapi"
-version = "1.4.2+260427"
+version = "1.5.0+260512"
 description = "Fake product RASENMAEHER integration API service"
 authors = [
     { name = "Eero af Heurlin", email = "eero.afheurlin@iki.fi" },

@@ -6,7 +6,7 @@ from rmfpapi import __version__
 
 def test_version() -> None:
     """Make sure version matches expected"""
-    assert __version__ == "1.4.2"
+    assert __version__ == "1.4.3"
 
 
 def test_healthcheck(mtlsclient: TestClient) -> None:

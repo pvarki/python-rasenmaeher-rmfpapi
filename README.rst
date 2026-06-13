@@ -1,6 +1,8 @@
-=======
-rmfpapi
-=======
+=================
+ARCHIVED: rmfpapi
+=================
+
+ARCHIVED: This is an old example/reference component, see https://github.com/pvarki/python-mediamtx-rmmtxauthz for a more complete example.
 
 Fake product RASENMAEHER integration API service. Serves as a reference implementation for a new integration into the deploy app ecosystem.
 
